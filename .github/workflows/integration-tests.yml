@@ -8,6 +8,8 @@ jobs:
     steps:
       - name: "checkout repo"
         uses: actions/checkout@v2
+      - name: tmp
+        run: cat ${{github.event_path}}
       
       - name: "checkout screenshot repo"
         uses: actions/checkout@v2
