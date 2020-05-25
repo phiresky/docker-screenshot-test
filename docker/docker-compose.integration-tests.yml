@@ -1,0 +1,9 @@
+version: "3.7"
+services:
+    tests:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.integration-tests
+        command: ""
+        environment:
+            - SERVER=http://node:3841

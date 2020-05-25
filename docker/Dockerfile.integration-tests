@@ -1,0 +1,35 @@
+# syntax=docker/dockerfile:experimental
+
+FROM node:lts-alpine
+
+RUN apk --update add --no-cache git
+
+RUN apk --update add --no-cache ttf-freefont chromium
+
+RUN npm -g install pm2
+
+ENV YARN_CACHE_FOLDER /yarn-cache
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD="true"
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+RUN mkdir /root/repo
+
+COPY .git /root/repo/.git
+
+WORKDIR /root/repo
+RUN git checkout .  
+
+RUN --mount=type=cache,target=/yarn-cache,id=yarn yarn install --frozen-lockfile
+
+COPY docker/config /root/repo/config
+
+ENV TS_NODE_TRANSPILE_ONLY 1
+ENV GD_MOCKING 1
+
+WORKDIR /root/repo/integration-tests
+
+RUN --mount=type=cache,target=/yarn-cache,id=yarn yarn install --frozen-lockfile
+
+RUN echo 'module.exports = {launch: { args: ["--headless", "--no-sandbox"] }};' > jest-puppeteer.config.js
+
+CMD sleep 5s && yarn run jest --runInBand
