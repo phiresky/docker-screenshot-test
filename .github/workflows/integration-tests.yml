@@ -5,5 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: run integration test
-        run: COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -p integ -f docker-compose.integration-tests.yml up --build --exit-code-from tests
+        run: docker-compose -p integ -f docker-compose.integration-tests.yml up --build --exit-code-from tests
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        working-directory: ./docker
