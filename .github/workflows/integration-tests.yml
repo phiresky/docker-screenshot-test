@@ -10,7 +10,7 @@ jobs:
       - name: "checkout screenshot repo"
         uses: actions/checkout@v2
         with:
-          repository: "git@github.com:phiresky/docker-screenshot-test-data.git"
+          repository: "phiresky/docker-screenshot-test-data"
           path: screenshot-repo
           ssh-key: ${{ secrets.SCREENSHOT_REPO_KEY }}
 
