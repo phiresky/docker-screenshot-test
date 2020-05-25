@@ -24,7 +24,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: /tmp/docker-registry
-          key: docker-registry-buildkit-${{ hashFiles('docker/Dockerfile.integration-tests') }}
+          key: docker-registry-buildkit-2-${{ hashFiles('docker/Dockerfile.integration-tests') }}
       - name: start local registry
         run: docker run -d -p 5000:5000 --restart=always --name registry -v /tmp/docker-registry:/var/lib/registry registry:2 && npx wait-on tcp:5000
       - name: pull from cache
