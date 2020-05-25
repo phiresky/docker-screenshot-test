@@ -39,6 +39,7 @@ jobs:
           RUN_REASON_MD: ${{ github.event_name }} ${{ github.event.pull_request.html_url }} (${{ github.ref }} ${{ github.sha }}) ${{ env.GITHUB_ACTOR }}
       - name: comment with link to screenshots
         uses: thollander/actions-comment-pull-request@master
+        if: always()
         with:
           message: |
             Run: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}

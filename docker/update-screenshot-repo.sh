@@ -11,7 +11,8 @@ shopt -s nullglob # skip if no files
 for f in "$DOCKER_OUTPUT_DIR/screenshots/"*; do
     cp "$f" "$dir/"
     fname="$(basename "$f")"    
-    echo -e "## $fname\n\n![$fname]($fname)\n" >> "$dir/README.md"
+    fnameesc="$(echo "$fname" | jq -sRr @uri)"
+    echo -e "## $fname\n\n![$fname]($fnameesc)\n" >> "$dir/README.md"
 done
 
 cd "$SCREENSHOT_REPO_DIR"
