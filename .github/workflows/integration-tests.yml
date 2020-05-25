@@ -21,14 +21,16 @@ jobs:
           DOCKER_BUILDKIT: 1
         working-directory: ./docker
       
-      - name: upload screenshots
+      - name: upload screenshots to artifacts
         uses: actions/upload-artifact@v2
         with:
           path: ./docker/output/screenshots/*.png
 
-      - name: cp to repo
+      - name: upload screenshots to repo
         run: ./docker/update-screenshot-repo.sh
         env:
           SCREENSHOT_REPO_DIR: ${{ github.workspace }}/screenshot-repo
           RUN_ID: ${{ github.run_id }}
           DOCKER_OUTPUT_DIR: ${{ github.workspace }}/docker/output
+          GITHUB_REPO_NAME: ${{ github.repository }}
+          RUN_REASON_MD: ${{ github.event_name }} ${{ github.ref }} ${{ env.GITHUB_ACTOR }}
