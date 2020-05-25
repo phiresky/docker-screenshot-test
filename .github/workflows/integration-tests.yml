@@ -4,7 +4,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: "checkout repo"
+        uses: actions/checkout@v2
+      
+      - name: "checkout screenshot repo"
+        uses: actions/checkout@v2
+        with:
+          repository: "git@github.com:phiresky/docker-screenshot-test-data.git"
+          path: screenshot-repo
+          ssh-key: ${{ secrets.SCREENSHOT_REPO_KEY }}
 
       - name: run integration test
         run: docker-compose -p integ -f docker-compose.integration-tests.yml up --build --exit-code-from tests
@@ -17,3 +25,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           path: ./docker/output/screenshots/*.png
+
+      - name: cp to repo
+        run: ./docker/update-screenshot-repo.sh
+        env:
+          SCREENSHOT_REPO_DIR: ${{ github.workspace }}/screenshot-repo
+          RUN_ID: ${{ gituhb.run_id }}
+          DOCKER_OUTPUT_DIR: ${{ github.workspace }}/docker/output
