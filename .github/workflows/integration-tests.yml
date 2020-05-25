@@ -24,12 +24,16 @@ jobs:
         with:
           path: /tmp/docker-registry
           key: docker-registry-buildkit-${{ hashFiles('docker/Dockerfile.integration-tests') }}
-      - run: docker run -d -p 5000:5000 --restart=always --name registry -v /tmp/docker-registry:/var/lib/registry registry:2 && npx wait-on tcp:5000
-      - run: docker-compose -p integ -f docker-compose.integration-tests.yml pull
+      - name: start local registry
+        run: docker run -d -p 5000:5000 --restart=always --name registry -v /tmp/docker-registry:/var/lib/registry registry:2 && npx wait-on tcp:5000
+      - name: pull from cache
+        run: docker-compose -p integ -f docker-compose.integration-tests.yml pull
         working-directory: ./docker
-      - run: docker-compose -p integ -f docker-compose.integration-tests.yml build
+      - name: build if necessary
+        run: docker-compose -p integ -f docker-compose.integration-tests.yml build
         working-directory: ./docker
-      - run: docker-compose -p integ -f docker-compose.integration-tests.yml push
+      - name: push to cache
+        run: docker-compose -p integ -f docker-compose.integration-tests.yml push
         working-directory: ./docker
       - name: run integration test
         run: docker-compose -p integ -f docker-compose.integration-tests.yml up --exit-code-from tests
@@ -50,7 +54,7 @@ jobs:
           GITHUB_REPO_NAME: ${{ github.repository }}
           RUN_REASON_MD: ${{ github.event_name }} ${{ github.event.pull_request.html_url }} (${{ github.ref }} ${{ github.sha }}) ${{ env.GITHUB_ACTOR }}
       - name: comment with link to screenshots
-        uses: thollander/actions-comment-pull-request@master
+        uses: thollander/actions-comment-pull-request@1.0.0
         if: always()
         with:
           message: |
