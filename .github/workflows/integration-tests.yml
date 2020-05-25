@@ -25,7 +25,7 @@ jobs:
           path: /tmp/docker-registry
           key: docker-registry-buildkit-${{ hashFiles('docker/Dockerfile.integration-tests') }}
       - run: docker run -d -p 5000:5000 --restart=always --name registry -v /tmp/docker-registry:/var/lib/registry registry:2 && npx wait-on tcp:5000
-      - run: docker-compose -p integ -f docker-compose.integration-tests.yml pull || true
+      - run: docker-compose -p integ -f docker-compose.integration-tests.yml pull
         working-directory: ./docker
       - run: docker-compose -p integ -f docker-compose.integration-tests.yml build
         working-directory: ./docker
