@@ -8,12 +8,6 @@ jobs:
     steps:
       - name: "checkout repo"
         uses: actions/checkout@v2
-      - name: tmp
-        run: cat ${{github.event_path}}
-            - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
       
       - name: "checkout screenshot repo"
         uses: actions/checkout@v2
