@@ -32,4 +32,4 @@ RUN --mount=type=cache,target=/yarn-cache,id=yarn yarn install --frozen-lockfile
 
 RUN echo 'module.exports = {launch: { args: ["--headless", "--no-sandbox"] }};' > jest-puppeteer.config.js
 
-CMD sleep 5s && yarn run jest --runInBand
+CMD npx wait-on $SERVER && yarn run jest --runInBand
