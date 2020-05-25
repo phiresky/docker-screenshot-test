@@ -4,6 +4,8 @@ services:
         build:
             context: ..
             dockerfile: docker/Dockerfile.integration-tests
+            args:
+                BUILDKIT_INLINE_CACHE: 1
         image:
             localhost:5000/testsimg
         volumes:

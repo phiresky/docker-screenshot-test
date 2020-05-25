@@ -7,6 +7,7 @@ jobs:
       SCREENSHOT_REPO: phiresky/docker-screenshot-test-data
       COMPOSE_DOCKER_CLI_BUILD: 1
       DOCKER_BUILDKIT: 1
+      BUILDKIT_INLINE_CACHE: 1
     steps:
       - name: "checkout repo"
         uses: actions/checkout@v2
