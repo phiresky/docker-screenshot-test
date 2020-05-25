@@ -5,7 +5,7 @@ services:
             context: ..
             dockerfile: docker/Dockerfile.integration-tests
         volumes:
-            - ./foo:/output-dir
+            - ./output:/output-dir
         environment:
             - SERVER=http://node:3841
             - SCREENSHOT_DIR=/output-dir/screenshots
