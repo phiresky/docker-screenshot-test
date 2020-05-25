@@ -10,6 +10,10 @@ jobs:
         uses: actions/checkout@v2
       - name: tmp
         run: cat ${{github.event_path}}
+            - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
       
       - name: "checkout screenshot repo"
         uses: actions/checkout@v2
@@ -37,9 +41,9 @@ jobs:
           RUN_ID: ${{ github.run_id }}
           DOCKER_OUTPUT_DIR: ${{ github.workspace }}/docker/output
           GITHUB_REPO_NAME: ${{ github.repository }}
-          RUN_REASON_MD: ${{ github.event.pull_request.html }} ${{ github.event_name }} ${{ github.ref }} ${{ env.GITHUB_ACTOR }}
+          RUN_REASON_MD: ${{ github.event_name }} ${{ github.event.pull_request.html_url }} (${{ github.ref }} ${{ github.sha }}) ${{ env.GITHUB_ACTOR }}
       - name: comment with link to screenshots
         uses: thollander/actions-comment-pull-request@master
         with:
-          message: 'Screenshots: https://github.com/${{ env.SCREENSHOT_REPO }}/tree/master/run-${{ github.run_id }}'
+          message: 'Run: https://github.com/${{github.repository}}/actions/run/${{github.run_id}} \n\n Screenshots: https://github.com/${{env.SCREENSHOT_REPO}}/tree/master/run-${{github.run_id}}'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

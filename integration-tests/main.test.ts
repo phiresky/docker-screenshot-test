@@ -6,13 +6,25 @@ if (screenshotDir) {
 	console.log("outputting screenshots to", screenshotDir);
 	fs.mkdirSync(screenshotDir, { recursive: true });
 }
+
+async function screenshot(name: string) {
+	if (!screenshotDir) return;
+	await page.screenshot({ path: path.join(screenshotDir, encodeURIComponent(name) + ".png") });
+}
 describe("Google", () => {
 	beforeAll(async () => {
 		await page.goto("https://google.com");
+		await screenshot("google homepage");
 	});
 
 	it('should display "google" text on page', async () => {
 		await expect(page).toMatch("google");
-		if (screenshotDir) await page.screenshot({ path: path.join(screenshotDir, "google-01.png") });
+	});
+
+	it("should be able to search for bing", async () => {
+		await page.type("input[name=q]", "bing search");
+		await screenshot("entering bing search");
+		await Promise.all([page.click("[aria-label='Google Search']"), page.waitForNavigation()]);
+		await screenshot("searched for bing");
 	});
 });
