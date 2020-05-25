@@ -19,7 +19,4 @@ describe("Google", () => {
 		await Promise.all([page.click("[aria-label='Google Search']"), page.waitForNavigation()]);
 		await screenshot("03 searched for bing");
 	});
-	it("is broken", async () => {
-		expect(true).toBe(false);
-	});
 });
