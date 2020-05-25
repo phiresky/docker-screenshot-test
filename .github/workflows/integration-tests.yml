@@ -5,6 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SCREENSHOT_REPO: phiresky/docker-screenshot-test-data
+      COMPOSE_DOCKER_CLI_BUILD: 1
+      DOCKER_BUILDKIT: 1
     steps:
       - name: "checkout repo"
         uses: actions/checkout@v2
@@ -15,12 +17,20 @@ jobs:
           repository: ${{ env.SCREENSHOT_REPO }}
           path: screenshot-repo
           ssh-key: ${{ secrets.SCREENSHOT_REPO_KEY }}
+      
+      - name: create docker cache repo
+        id: cache-docker
+        uses: actions/cache@v1
+        with:
+          path: /tmp/docker-registry
+          key: docker-registry-buildkit-${{ hashFiles('docker/Dockerfile.integration-tests') }}
+      - run: docker run -d -p 5000:5000 --restart=always --name registry -v /tmp/docker-registry:/var/lib/registry registry:2 && npx wait-on tcp:5000
+      - run: docker-compose -p integ -f docker-compose.integration-tests.yml pull || true
+      - run: docker-compose -p integ -f docker-compose.integration-tests.yml build
+      - run: docker-compose -p integ -f docker-compose.integration-tests.yml push
 
       - name: run integration test
-        run: docker-compose -p integ -f docker-compose.integration-tests.yml up --build --exit-code-from tests
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
+        run: docker-compose -p integ -f docker-compose.integration-tests.yml up --exit-code-from tests
         working-directory: ./docker
       
       #- name: upload screenshots to artifacts

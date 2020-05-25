@@ -4,6 +4,8 @@ services:
         build:
             context: ..
             dockerfile: docker/Dockerfile.integration-tests
+        image:
+            localhost:5000/testsimg
         volumes:
             - ./output:/output-dir
         environment:
