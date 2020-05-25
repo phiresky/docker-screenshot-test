@@ -4,6 +4,8 @@ services:
         build:
             context: ..
             dockerfile: docker/Dockerfile.integration-tests
-        command: ""
+        volumes:
+            - ./foo:/output-dir
         environment:
             - SERVER=http://node:3841
+            - SCREENSHOT_DIR=/output-dir/screenshots
