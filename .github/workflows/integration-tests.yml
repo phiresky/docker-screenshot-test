@@ -14,7 +14,6 @@ jobs:
         working-directory: ./docker
       
       - name: upload screenshots
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
-          name: screenshots
-          path: ./docker/output/screenshots
+          path: ./docker/output/screenshots/*.png
