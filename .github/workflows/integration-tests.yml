@@ -1,8 +1,13 @@
 name: Integration tests in Docker
-on: push
+on: pull_request
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      SCREENSHOT_REPO: phiresky/docker-screenshot-test-data
+      COMPOSE_DOCKER_CLI_BUILD: 1
+      DOCKER_BUILDKIT: 1
+      BUILDKIT_INLINE_CACHE: 1
     steps:
       - name: "checkout repo"
         uses: actions/checkout@v2
@@ -10,27 +15,51 @@ jobs:
       - name: "checkout screenshot repo"
         uses: actions/checkout@v2
         with:
-          repository: "phiresky/docker-screenshot-test-data"
+          repository: ${{ env.SCREENSHOT_REPO }}
           path: screenshot-repo
           ssh-key: ${{ secrets.SCREENSHOT_REPO_KEY }}
-
+      
+      - name: create docker cache repo
+        id: cache-docker
+        uses: actions/cache@v1
+        with:
+          path: /tmp/docker-registry
+          key: docker-registry-buildkit-2-${{ hashFiles('docker/Dockerfile.integration-tests') }}
+      - name: start local registry
+        run: docker run -d -p 5000:5000 --restart=always --name registry -v /tmp/docker-registry:/var/lib/registry registry:2 && npx wait-on tcp:5000
+      - name: pull from cache
+        run: docker-compose -p integ -f docker-compose.integration-tests.yml pull
+        working-directory: ./docker
+      - name: build if necessary
+        run: docker-compose -p integ -f docker-compose.integration-tests.yml build
+        working-directory: ./docker
+      - name: push to cache
+        run: docker-compose -p integ -f docker-compose.integration-tests.yml push
+        working-directory: ./docker
       - name: run integration test
-        run: docker-compose -p integ -f docker-compose.integration-tests.yml up --build --exit-code-from tests
-        env:
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          DOCKER_BUILDKIT: 1
+        run: docker-compose -p integ -f docker-compose.integration-tests.yml up --exit-code-from tests
         working-directory: ./docker
       
-      - name: upload screenshots to artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          path: ./docker/output/screenshots/*.png
+      #- name: upload screenshots to artifacts
+      #  uses: actions/upload-artifact@v2
+      #  with:
+      #    path: ./docker/output/screenshots
 
       - name: upload screenshots to repo
         run: ./docker/update-screenshot-repo.sh
+        if: always()
         env:
           SCREENSHOT_REPO_DIR: ${{ github.workspace }}/screenshot-repo
           RUN_ID: ${{ github.run_id }}
           DOCKER_OUTPUT_DIR: ${{ github.workspace }}/docker/output
           GITHUB_REPO_NAME: ${{ github.repository }}
-          RUN_REASON_MD: ${{ github.event.pull_request.html }} ${{ github.event_name }} ${{ github.ref }} ${{ env.GITHUB_ACTOR }}
+          RUN_REASON_MD: ${{ github.event_name }} ${{ github.event.pull_request.html_url }} (${{ github.ref }} ${{ github.sha }}) ${{ env.GITHUB_ACTOR }}
+      - name: comment with link to screenshots
+        uses: thollander/actions-comment-pull-request@1.0.0
+        if: always()
+        with:
+          message: |
+            Run: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
+            
+            Screenshots: https://github.com/${{env.SCREENSHOT_REPO}}/tree/master/run-${{github.run_id}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
