@@ -20,4 +20,6 @@ describe("Google", () => {
 		await screenshot("03 searched for bing");
 		await screenshot("03 searched for bing b");
 	});
+
+  
 });
