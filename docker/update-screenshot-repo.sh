@@ -12,6 +12,8 @@ for f in "$DOCKER_OUTPUT_DIR/screenshots/"*; do
 done
 
 cd "$SCREENSHOT_REPO_DIR"
+git config --local user.email "action@github.com"
+git config --local user.name "GitHub Action"
 git add --all
 git commit -m"add run $RUN_ID"
 git push
