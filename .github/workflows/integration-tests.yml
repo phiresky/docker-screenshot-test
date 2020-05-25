@@ -39,5 +39,8 @@ jobs:
       - name: comment with link to screenshots
         uses: thollander/actions-comment-pull-request@master
         with:
-          message: 'Run: https://github.com/${{github.repository}}/actions/run/${{github.run_id}} \n\n Screenshots: https://github.com/${{env.SCREENSHOT_REPO}}/tree/master/run-${{github.run_id}}'
+          message: |
+            Run: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
+            
+            Screenshots: https://github.com/${{env.SCREENSHOT_REPO}}/tree/master/run-${{github.run_id}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

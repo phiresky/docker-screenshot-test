@@ -5,12 +5,14 @@ dir="$SCREENSHOT_REPO_DIR/run-$RUN_ID"
 mkdir -p "$dir"
 
 
+echo -e "Screenshots for $RUN_REASON_MD ([run $RUN_ID](https://github.com/$GITHUB_REPO_NAME/actions/runs/$RUN_ID))\n" >> "$dir/README.md"
+
+shopt -s nullglob # skip if no files
 for f in "$DOCKER_OUTPUT_DIR/screenshots/"*; do
     cp "$f" "$dir/"
-    fname="$(basename "$f")"
-    echo -e "Screenshots for $RUN_REASON_MD ([run $RUN_ID](https://github.com/$GITHUB_REPO_NAME/actions/runs/$RUN_ID))\n" >> "$dir/README.md"
+    fname="$(basename "$f")"    
     echo -e "## $fname\n\n![$fname]($fname)\n" >> "$dir/README.md"
-done
+done; fi
 
 cd "$SCREENSHOT_REPO_DIR"
 git config --local user.email "action@github.com"
